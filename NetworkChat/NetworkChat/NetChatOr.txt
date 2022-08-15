@@ -1,0 +1,77 @@
+
+#include <iostream>
+#include <WinSock2.h>
+#include <WS2tcpip.h>
+#include <stdio.h>
+#include <vector>
+
+#pragma comment(lib, "Ws2_32.lib")
+
+using namespace std;
+
+
+
+int main(void)
+{
+	WSAData wsData;
+	if (WSAStartup(MAKEWORD(2, 2), &wsData)) {
+		
+		cout << "Error WinSock initialisation";
+		cout << WSAGetLastError();
+	}
+
+	SOCKET sock = socket (AF_INET, SOCK_STREAM, IPPROTO_TCP);
+	
+	sockaddr_in servAddr;
+	memset(servAddr.sin_zero, 0, sizeof(servAddr.sin_zero));
+	servAddr.sin_family = AF_INET;
+	servAddr.sin_port = htons(55555);
+	servAddr.sin_addr.S_un.S_addr = INADDR_ANY;
+	/*servAddr.sin_addr.S_un.S_un_b.s_b1 = 127;
+	servAddr.sin_addr.S_un.S_un_b.s_b2 = 0;
+	servAddr.sin_addr.S_un.S_un_b.s_b3 = 0;
+	servAddr.sin_addr.S_un.S_un_b.s_b4 = 1;
+	*/
+
+	if (bind(sock, (sockaddr*) &servAddr, sizeof(servAddr))) {
+
+		cout << "Error WinSock bind";
+		cout << WSAGetLastError();
+	}
+
+	if (listen(sock, SOMAXCONN)) {
+		cout << "Error WinSock listen";
+		cout << WSAGetLastError();
+	}
+
+	cout << "Start listening...\n";
+
+	
+	sockaddr connAddr;
+	sockaddr* pConnAddr = &connAddr;
+	int connAddrSize = sizeof(connAddr);
+	SOCKET connSock = accept(sock, pConnAddr, &connAddrSize);
+
+	cout << "Accepting connection.\n";
+
+	char buf[100];
+
+	//cin >> buf;
+
+	if (recv(connSock, buf, 100, 0) == -1) {
+		cout << "Error WinSock recv";
+		cout << WSAGetLastError();
+	}
+
+	cout << buf<< '\n';
+	
+	system("pause");
+
+	shutdown(connSock, SD_BOTH);
+	closesocket(connSock);
+	shutdown(sock, SD_BOTH);
+	closesocket(sock);
+	WSACleanup();
+	return 0;
+
+}

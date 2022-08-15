@@ -1,0 +1,63 @@
+
+#include <iostream>
+#include <WinSock2.h>
+#include <WS2tcpip.h>
+#include <stdio.h>
+#include <vector>
+
+#pragma comment(lib, "Ws2_32.lib")
+
+using namespace std;
+
+
+int main(void)
+{
+	WSAData wsData;
+	if (WSAStartup(MAKEWORD(2, 2), &wsData)) {
+		
+		cout << "Error WinSock initialisation";
+		cout << WSAGetLastError();
+	}
+
+	SOCKET sock = socket (AF_INET, SOCK_STREAM, IPPROTO_TCP);
+
+	sockaddr_in clientAddr;
+	memset(clientAddr.sin_zero, 0, sizeof(clientAddr.sin_zero));
+	clientAddr.sin_family = AF_INET;
+	clientAddr.sin_port = htons(55555);
+	clientAddr.sin_addr.S_un.S_un_b.s_b1 = 127;
+	clientAddr.sin_addr.S_un.S_un_b.s_b2 = 0;
+	clientAddr.sin_addr.S_un.S_un_b.s_b3 = 0;
+	clientAddr.sin_addr.S_un.S_un_b.s_b4 = 1;
+	
+	
+
+	if (connect(sock, (sockaddr*) &clientAddr, sizeof(clientAddr)) == -1) {
+		cout << "Error WinSock connect";
+		cout << WSAGetLastError();
+	}
+	
+	cout << "Connect stating...\n";
+	
+
+	char buf[100];
+
+	cin >> buf;
+
+	if (send(sock, buf, 100, 0) == -1) {
+		cout << "Error WinSock send";
+		cout << WSAGetLastError();
+	}
+	cout << "Message sends\n";
+	
+
+	system("pause");
+
+	shutdown(sock, SD_BOTH);
+	closesocket(sock);
+	WSACleanup();
+
+
+	return 0;
+
+}
