@@ -46,10 +46,8 @@ int main(void)
 		while (time_t curTime = time(0) < workTime) {
 			int dataReceived =
 				connSocket->Receive(segment, GOOD_SEGMENT_SIZE);
-			//cout << "dataReceived: "<< dataReceived<<endl;
 			if (dataReceived > 0)
 			{
-				// ProcessDataFromClient(socket, segment, dataReceived);
 				cout << "      --- Message from Server : " << segment << endl;
 			}
 		}
@@ -57,8 +55,6 @@ int main(void)
 	t.detach();
 	while (time_t curTime = time(0) < workTime)
 	{
-		
-		//Sleep(1);
 		char segmentTo[GOOD_SEGMENT_SIZE];
 		cout << "Who receive a message : ";
 		cin >> segmentTo;
