@@ -45,65 +45,43 @@ int main(void)
             nullptr, nullptr))
         {
             
-            // ïîëó÷åí ïàêåò — îáîéòè ñîêåòû...
+            // Ã¯Ã®Ã«Ã³Ã·Ã¥Ã­ Ã¯Ã ÃªÃ¥Ã² â€” Ã®Ã¡Ã®Ã©Ã²Ã¨ Ã±Ã®ÃªÃ¥Ã²Ã»...
             for (const TCPSocketPtr& socket : readableSockets)
             {
                 if (socket == listenSocket)
                 {
-                    // ýòî ñîêåò, ïðèíèìàþùèé çàïðîñû íà ñîåäèíåíèå,
-                    // ïðèíÿòü íîâîå ñîåäèíåíèå
+                    // Ã½Ã²Ã® Ã±Ã®ÃªÃ¥Ã², Ã¯Ã°Ã¨Ã­Ã¨Ã¬Ã Ã¾Ã¹Ã¨Ã© Ã§Ã Ã¯Ã°Ã®Ã±Ã» Ã­Ã  Ã±Ã®Ã¥Ã¤Ã¨Ã­Ã¥Ã­Ã¨Ã¥,
+                    // Ã¯Ã°Ã¨Ã­Ã¿Ã²Ã¼ Ã­Ã®Ã¢Ã®Ã¥ Ã±Ã®Ã¥Ã¤Ã¨Ã­Ã¥Ã­Ã¨Ã¥
                     SocketAddress newClientAddress;                
                         auto newSocket = listenSocket->Accept(newClientAddress);
-                    readBlockSockets.push_back(newSocket);
-                   // ProcessNewClient(newSocket, newClientAddress);
+                    readBlockSockets.push_back(newSocket);           
                     const char* pch = "Successful connection to server.\0";
                     newSocket->Send(pch, GOOD_SEGMENT_SIZE);
                     
                 }
                 else
                 {
-                    // ýòî îáû÷íûé ñîêåò — îáðàáîòàòü äàííûå...
+                    // Ã½Ã²Ã® Ã®Ã¡Ã»Ã·Ã­Ã»Ã© Ã±Ã®ÃªÃ¥Ã² â€” Ã®Ã¡Ã°Ã Ã¡Ã®Ã²Ã Ã²Ã¼ Ã¤Ã Ã­Ã­Ã»Ã¥...
                     char segment[GOOD_SEGMENT_SIZE];
                     
                     int dataReceived =
                         socket->Receive(segment, GOOD_SEGMENT_SIZE);
-                    //cout << "dataREcv : " << dataReceived << endl;
-                    //cout << "segment : " << segment << endl;
                     if (dataReceived > 0)
                     {                    
                         char name[21];         
                         strncpy_s(name, segment, 20);
                         if (!socket->HaveName()) { // set client's namee
-                            //cout << "setname\n";
                             socket->SetName(name);
-                            //cout << "name length :" << strlen(name);
-                            //cout << socket->GetName()<<endl;
                         }
                         else if (socket->HaveName() && readBlockSockets.size() > 2) {
-                           // cout << "searchname\n";
                             for (const TCPSocketPtr& sock : readBlockSockets) // find receiver
                             {
-                                //cout << "sock->GetName() : " << sock->GetName() << endl;
-                                //cout << "name :" << name << endl;
-                                
                                 if (strncmp(sock->GetName(), name, strlen(sock->GetName())) == 0) {
                                     sock->Send(segment + NAME_SIZE, GOOD_SEGMENT_SIZE);
-                                    //cout << "findname\n";
                                 }
-
                             }
-                            // ProcessDataFromClient(socket, segment, dataReceived);
-                            //std::cout << "Message from Client : " << segment << endl;
-                        }
-                        
-                        
-                        
+                        }  
                     }
-                    /*cout << "Message to Client: ";
-                    char segmentTo[GOOD_SEGMENT_SIZE];
-                    cin >> segmentTo;
-                    listenSocket->Send(segmentTo, GOOD_SEGMENT_SIZE);
-                    std::cout << "Message send.\n";*/
                 }
             }
         }
